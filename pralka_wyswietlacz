@@ -1,0 +1,87 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date:    09:30:19 06/01/2015 
+-- Design Name: 
+-- Module Name:    wysw - wysw_arch 
+-- Project Name: 
+-- Target Devices: 
+-- Tool versions: 
+-- Description: 
+--
+-- Dependencies: 
+--
+-- Revision: 
+-- Revision 0.01 - File Created
+-- Additional Comments: 
+--
+----------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.all;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx primitives in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity wysw is
+    Port ( d : in  STD_LOGIC_VECTOR (7 downto 0);
+           clk : in  STD_LOGIC;
+           nreset : in  STD_LOGIC;
+           dig : out  STD_LOGIC_VECTOR (3 downto 0);
+           segm : out  STD_LOGIC_VECTOR (6 downto 0));
+end wysw;
+
+architecture wysw_arch of wysw is
+
+signal adr: std_logic_vector (1 downto 0);
+signal bcd : std_logic_vector(3 downto 0);
+
+begin 
+
+--dekoder wysw. cyfr
+with adr select 
+	dig <= "1110" when "00", -- cyfra 0(jedn.)
+			"1101" when "01", -- cyfra 1(dzies.)
+			"1111" when others; 
+
+--MUX danych do wysw.
+with adr select
+	bcd <= d(7 downto 4) when "01",
+			 d(3 downto 0) when "00",
+			 "1111" when others;
+
+licz_adr: process(clk,nreset)
+begin
+if(nreset='1') then adr <= "00";
+	elsif (clk = '1' and clk'event) then
+		adr <= adr+1;
+end if;
+
+end process licz_adr;
+
+--dekoder
+
+with bcd select
+-- g f e d c b a
+
+segm <= "0111111" when "0000", --0
+		  "0000110" when "0001", --1
+		  "1011011" when "0010", --2
+		  "0110000" when "0011",  -- 3
+		  "1100110" when "0100",  -- 4
+        "1101101" when "0101",  -- 5
+        "1111101" when "0110",  -- 6
+        "0000111" when "0111",  -- 7
+        "1111111" when "1000",  -- 8
+        "1101111" when "1001",  -- 9
+        "0000000" when others;  -- wygszenie	
+
+end wysw_arch;
+
