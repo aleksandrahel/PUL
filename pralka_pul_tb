@@ -1,0 +1,172 @@
+--------------------------------------------------------------------------------
+-- Company: 
+-- Engineer:
+--
+-- Create Date:   07:26:08 06/01/2015
+-- Design Name:   
+-- Module Name:   C:/Users/Aleksandra/pul_pralka/pralka_pul_tb.vhd
+-- Project Name:  pul_pralka
+-- Target Device:  
+-- Tool versions:  
+-- Description:   
+-- 
+-- VHDL Test Bench Created by ISE for module: pralka_pul
+-- 
+-- Dependencies:
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+--
+-- Notes: 
+-- This testbench has been automatically generated using types std_logic and
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends
+-- that these types always be used for the top-level I/O of a design in order
+-- to guarantee that the testbench will bind correctly to the post-implementation 
+-- simulation model.
+--------------------------------------------------------------------------------
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+ 
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--USE ieee.numeric_std.ALL;
+ 
+ENTITY pralka_pul_tb IS
+END pralka_pul_tb;
+ 
+ARCHITECTURE behavior OF pralka_pul_tb IS 
+ 
+    -- Component Declaration for the Unit Under Test (UUT)
+ 
+    COMPONENT pralka_pul
+    PORT(
+         clk : IN  std_logic;
+         reset : IN  std_logic;
+         prog : IN  std_logic_vector(1 downto 0);
+         temp : IN  STD_LOGIC_vector(1 downto 0);
+			woda_hi : IN  std_logic;
+         woda_lo : IN  std_logic;
+         s_wyl : OUT  std_logic;
+         s_woda : OUT  std_logic;
+         s_prwst : OUT  std_logic;
+         s_prwla : OUT  std_logic;
+         s_odpomp : OUT  std_logic;
+         s_wir : OUT  std_logic;
+			gotowe : out  STD_LOGIC
+        );
+    END COMPONENT;
+    
+
+   --Inputs
+   signal clk : std_logic := '0';
+   signal reset : std_logic := '0';
+   signal prog : std_logic_vector(1 downto 0) := (others => '0');
+   signal temp : std_logic_vector(1 downto 0) := (others => '0');
+   signal woda_hi : std_logic := '0';
+   signal woda_lo : std_logic := '0';
+
+ 	--Outputs
+   signal s_wyl : std_logic;
+   signal s_woda : std_logic;
+   signal s_prwst : std_logic;
+   signal s_prwla : std_logic;
+   signal s_odpomp : std_logic;
+   signal s_wir : std_logic;
+	signal gotowe : STD_LOGIC;
+
+
+   -- Clock period definitions
+   constant clk_period : time := 10 ns;
+ 
+BEGIN
+ 
+	-- Instantiate the Unit Under Test (UUT)
+   uut: pralka_pul PORT MAP (
+          clk => clk,
+          reset => reset,
+          prog => prog,
+          temp => temp,
+          woda_hi => woda_hi,
+          woda_lo => woda_lo,
+          s_wyl => s_wyl,
+          s_woda => s_woda,
+          s_prwst => s_prwst,
+          s_prwla => s_prwla,
+          s_odpomp => s_odpomp,
+          s_wir => s_wir,
+			 gotowe=>gotowe
+        );
+
+   -- Clock process definitions
+   clk_process :process
+   begin
+		clk <= '0';
+		wait for clk_period/2;
+		clk <= '1';
+		wait for clk_period/2;
+   end process;
+ 
+
+   -- Stimulus process
+   stim_proc: process
+   begin		
+      -- hold reset state for 100 ns.
+      wait for 100 ns;	
+
+      wait for clk_period*10;
+
+      -- insert stimulus here 
+		reset <= '1';
+      wait for clk_period;
+		
+		reset <= '0';
+		woda_hi <='1';
+		temp<="01";
+		wait for clk_period/2;
+		
+		prog<= "00";
+		wait for clk_period;
+		
+		prog <= "01";
+		wait for clk_period;
+		
+		prog <= "01";
+		temp<="11";
+		wait for clk_period*51;
+	 
+		
+		reset <= '0';
+		prog <= "00";
+		woda_lo<='1';
+		wait for clk_period;
+		
+		reset <= '0';
+		wait for clk_period;
+		
+		prog <= "01";
+		woda_lo<='1';
+		wait for clk_period*95;
+	
+		woda_lo<='0';
+		prog <= "11";
+		wait for clk_period;
+		
+		woda_lo<='1';
+		woda_hi<='0';
+		prog <= "01";
+		wait for clk_period*95;
+		
+		prog <= "01";
+		wait for clk_period*95;
+		
+		prog <= "01";
+		wait for clk_period;
+		
+		
+     assert false severity failure;
+
+      wait;
+   end process;
+
+END;
